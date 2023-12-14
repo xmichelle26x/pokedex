@@ -1,10 +1,15 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-key */
 import usePokemons from "../hooks/usePokemons";
+import { useState } from "react";
+import PokemonDetails from "./PokemonDetails";
 
-function Pokemon({ id, nombre, imagen }) {
+function Pokemon({ id, nombre, imagen, seePokemon }) {
   return (
-    <div className="max-w-sm p-6 bg-gray-200 border border-gray-200 rounded-lg capitalize hover:shadow-lg hover:bg-yellow-100 hover:cursor-pointer">
+    <div className="max-w-sm p-6 bg-gray-200 border border-gray-200 rounded-lg capitalize hover:shadow-lg hover:bg-yellow-100 hover:cursor-pointer"
+    onClick={seePokemon}>
       <img
         src={imagen}
         alt={nombre}
@@ -20,12 +25,21 @@ function Pokemon({ id, nombre, imagen }) {
 
 function Pokemons() {
   const { pokemons, morePokemons } = usePokemons();
+  const [show, setShow] = useState({ show: false, pokemon: {} });
+  const seePokemon = (pokemon) => setShow({ show: true, pokemon });
+
+  const noSeePokemon = () => {
+    setShow({ show: false, pokemon: {} });
+    setBusqueda("");
+  };
 
   return (
     <>
-      <section className="justify-items-center flex-wrap grid grid-cols-5 gap-10 p-10 mx-0 my-auto">
+      <PokemonDetails {...show} close={noSeePokemon} />
+
+      <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-10 p-4 md:p-8 lg:p-10 xl:p-12 mx-auto my-auto">
         {pokemons.map((pokemon) => (
-          <Pokemon key={pokemon.id} {...pokemon} />
+          <Pokemon key={pokemon.id} {...pokemon} seePokemon={() => seePokemon(pokemon)}/>
         ))}
       </section>
       <div className="flex justify-center pb-10 mx-0">

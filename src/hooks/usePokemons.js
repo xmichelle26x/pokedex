@@ -5,18 +5,27 @@ const URL_DEFAULT = "https://pokeapi.co/api/v2/pokemon?limit=20&offset=0";
 
 function usePokemons() {
   const [pokemons, setPokemons] = useState([]);
-  const [nextUrl, setNextUrl] = useState('');
+  const [nextUrl, setNextUrl] = useState("");
 
   const fetchPokemon = async (url) => {
-    const response = await fetch(url)
-    const poke = await response.json()
+    const response = await fetch(url);
+    const poke = await response.json();
+
+    const abilities = poke.abilities.map((a) => a.ability.name);
+    const stats = poke.stats.map((s) => { 
+        return { name: s.stat.name, base: s.base_stat }; 
+    });
+    const types = poke.types.map((t) => t.type.name);
 
     return {
       id: poke.id,
       nombre: poke.name,
       imagen: poke.sprites.other.dream_world.front_default || poke.sprites.front_default,
-    }
-  }
+      abilities,
+      stats,
+      types,
+    };
+  };
 
   const getPokemon = async (url = URL_DEFAULT) => {
     //recover pokemons list
@@ -25,27 +34,29 @@ function usePokemons() {
     const { next, results } = pokemonsList;
 
     const pokemons = await Promise.all(
-      results.map(async (pokemon) =>  fetchPokemon(pokemon.url))
-      );
-      
-      return { next, pokemons };
-};
- 
+      results.map(async (pokemon) => fetchPokemon(pokemon.url))
+    );
+
+    return { next, pokemons };
+  };
+
   const getPokemons = async () => {
-    const { next, pokemons } = await getPokemon()
-    setPokemons(pokemons)
-    setNextUrl(next)
-  }
+    const { next, pokemons } = await getPokemon();
+    setPokemons(pokemons);
+    setNextUrl(next);
+  };
 
-  const morePokemons = async () => { 
-    const { next, pokemons } = await getPokemon(nextUrl)
-    setPokemons(prev => [...prev, ...pokemons]) 
-    setNextUrl(next)
-  }
+  const morePokemons = async () => {
+    const { next, pokemons } = await getPokemon(nextUrl);
+    setPokemons((prev) => [...prev, ...pokemons]);
+    setNextUrl(next);
+  };
 
-  useEffect(() => { getPokemons() }, [])
+  useEffect(() => {
+    getPokemons();
+  }, []);
 
-  return { pokemons, morePokemons }
+  return { pokemons, morePokemons };
 }
 
 export default usePokemons;
