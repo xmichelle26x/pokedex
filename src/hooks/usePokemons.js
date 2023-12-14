@@ -39,7 +39,7 @@ function usePokemons() {
 
   const morePokemons = async () => { 
     const { next, pokemons } = await getPokemon(nextUrl)
-    setPokemons(prev => [...prev, ...pokemons])
+    setPokemons(prev => [...prev, ...pokemons]) 
     setNextUrl(next)
   }
 
